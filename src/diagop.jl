@@ -1,3 +1,25 @@
+
+isfiniterange(::,k) = false
+isfiniterange(B::KroneckerOperator,k::Integer) = isfinite(size(B.ops[k],1))
+isfiniterange(B::PlusOperator,k::Integer) = isfiniterange(first(B.ops),k)
+
+
+
+
+
+function findfunctionals(A::Vector,k::Integer)
+    T=eltype(eltype(eltype(A)))
+    indsBx=find(f->isfiniterange(f,k),A)
+    if k==1
+        indsBx,Operator{T}[(@assert dekron(Ai,2)==ConstantOperator(Float64,1.0); dekron(Ai,1)) for Ai in A[indsBx]]
+    else
+        @assert k==2
+        indsBx,Operator{T}[(@assert dekron(Ai,1)==ConstantOperator(Float64,1.0); dekron(Ai,2)) for Ai in A[indsBx]]
+    end
+end
+
+
+
 # Operators that are diagonal in a dimension can be solved in O(n) operations
 # isdiagop is used to inspect an operator to see if it is diagonal
 
